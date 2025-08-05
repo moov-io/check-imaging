@@ -52,3 +52,20 @@ pip install -r requirements.txt
 ```
 uvicorn main:app --reload
 ```
+
+5. Install Ollama and download 
+```
+    curl -fsSL https://ollama.com/install.sh | sh
+```
+
+6. Reload your terminal to load ollma.
+
+7. Download llava:7b.
+```
+    ollama pull llava:7b
+```
+
+## Available Models
+- `gemma3:4b`
+- `llava:7b`
+- `llava`

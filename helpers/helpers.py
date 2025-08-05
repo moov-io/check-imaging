@@ -4,12 +4,15 @@ from typing import Callable
 from functools import wraps
 from uuid import uuid4
 from decimal import Decimal
-import re
 import pillow_avif
 from PIL import Image, ImageOps
 from pillow_heif import register_heif_opener
 import requests
 from fastapi import HTTPException, UploadFile
+from schemas.schemas import Check
+import ollama
+
+register_heif_opener()
 
 def download_file_from_url(url, output_path):
     '''
@@ -83,3 +86,25 @@ def image_upload_decorator(
 
         return wrapper
     return decorator
+
+async def get_check_data_from_image(image_path):
+    response = ollama.chat(
+        model='llava:7b',
+        messages=[
+            {
+                'role': 'user',
+                'content': 'Analyze this image and get bank check information in detail.',
+                'images': [image_path]
+            },
+        ],
+        format=Check.model_json_schema()
+    )
+
+    print(response['message'])
+
+    try:
+        check_data = Check.model_validate_json(response.message.content)
+
+        return check_data
+    except:
+        return None

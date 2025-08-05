@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, File, UploadFile, Form, HTTPException
-from helpers.helpers import image_upload_decorator
+from helpers.helpers import image_upload_decorator, get_check_data_from_image
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 router = APIRouter()
@@ -13,7 +13,12 @@ router = APIRouter()
 async def format_check_image_api(
     image_file: UploadFile = File(None, title="Input Check Image"),
     image_url: str = Form('', title="Check Image URL"),
+    image_file_path=None,
     image_data=None):
 
+    result = await get_check_data_from_image(image_file_path)
+    
+    if result:
+        return JSONResponse(content=jsonable_encoder(result))
 
-    return JSONResponse(content={'data': None})
+    return JSONResponse(status_code=400, content="Failed to parse check.")
