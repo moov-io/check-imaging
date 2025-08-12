@@ -1,22 +1,23 @@
 import os
+import subprocess
+import json
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 from app.v1.image_controller import router as image_router
-import json
 from core.config import TEMP_DIR_PATH
-import subprocess
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     os.makedirs(TEMP_DIR_PATH, mode=777, exist_ok=True)
-    
+
     # Startup event: Start Ollama server
     print("Starting Ollama server...")
     # You might need to adjust the command based on your Ollama installation
-    ollama_process = subprocess.Popen(["ollama", "serve"]) 
+    ollama_process = subprocess.Popen(["ollama", "serve"])
     print("Ollama server started.")
 
     yield

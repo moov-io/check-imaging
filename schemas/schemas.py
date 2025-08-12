@@ -1,6 +1,6 @@
+from typing import Optional, List
 from dataclasses import dataclass
 from pydantic import BaseModel
-from typing import Optional, List
 
 @dataclass
 class Amount(BaseModel):

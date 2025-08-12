@@ -32,7 +32,7 @@ def download_file_from_url(url, output_path):
 def url_to_image(url:str) -> Image.Image:
     if not url:
         return None
-    
+
     try:
         response = requests.get(url, timeout=5, verify=False)
         response.raise_for_status()
