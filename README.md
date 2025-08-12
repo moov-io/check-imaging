@@ -20,3 +20,52 @@ with open('tests/check_front.jpg', 'rb') as in_file:
     with open('tests/check_front.tiff', 'wb') as out_file:
         out_file.write(converted.getvalue())
 ```
+
+## Installation Guide
+1. Install Conda Environment
+```
+mkdir -p ~/miniconda3
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
+bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+rm -rf ~/miniconda3/miniconda.sh
+
+~/miniconda3/bin/conda init bash
+~/miniconda3/bin/conda init zsh
+```
+
+2. Create a new conda environment
+```
+conda create --name moovenv python=3.12
+```
+
+3. Activate the environment.
+```
+conda activate moovenv
+```
+
+4. Install requirements
+```
+pip install -r requirements.txt
+```
+
+5. Run API server
+```
+uvicorn main:app --reload
+```
+
+5. Install Ollama and download 
+```
+    curl -fsSL https://ollama.com/install.sh | sh
+```
+
+6. Reload your terminal to load ollma.
+
+7. Download llava:7b.
+```
+    ollama pull llava:7b
+```
+
+## Available Models
+- `gemma3:4b`
+- `llava:7b`
+- `llava`
