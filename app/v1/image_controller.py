@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, UploadFile, Form, HTTPException
+from fastapi import APIRouter, File, UploadFile, Form
 from helpers.helpers import image_upload_decorator, get_check_data_from_image
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse

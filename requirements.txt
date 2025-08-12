@@ -7,4 +7,5 @@ pillow-avif-plugin
 uuid
 opencv-python
 requests
+pydantic
 ollama
