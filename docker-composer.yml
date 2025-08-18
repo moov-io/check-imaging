@@ -1,0 +1,40 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/version"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # For NVIDIA GPUs (optional), uncomment one of the following:
+    # gpus: all
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - capabilities: ["gpu"]
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: check-imaging-api
+    ports:
+      - "8000:8000"
+    environment:
+      # If your app talks to Ollama, point it at the service name
+      - OLLAMA_HOST=http://ollama:11434
+    depends_on:
+      ollama:
+        condition: service_healthy
+    # If your API needs extra env like thresholds, add them here:
+    # environment:
+    #   - DEFAULT_THRESHOLD=0.67
+
+volumes:
+  ollama:

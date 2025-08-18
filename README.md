@@ -1,71 +1,108 @@
-# Check Imaging
+# Check Imaging API
 
-A collection of tools for processing check images, especially for use in Image Cash Letter (X9) file creation.
+Get information from your check image.
 
-## Dependencies
+## Installation (Docker)
 
-- **Python 3**
-- **ImageMagick 7+** There is a bug in ImageMagick 6 that will cause the black and white images to appear red
-- **MICR font** For deposit ticket generation
+### 1. Build the Image
 
-## Example usage
+From the project root (where your `Dockerfile` lives):
 
-Convert an image of a check to a black and white TIFF for use in an X9 file. You may have to tweak the threshold to arrive at a clear image.
+```bash
+docker build -t check-imaging:latest .
+```
+
+> **Note on Dependencies:**
+>
+> - If your processing pipeline needs ImageMagick 7+ or the MICR font inside the container, make sure your `Dockerfile` installs them (e.g., `apt-get update && apt-get install -y imagemagick fonts-...`).
+> - If you want the Ollama CLI available in the container, add the following to your `Dockerfile`:
+>   ```dockerfile
+>   RUN curl -fsSL https://ollama.com/install.sh | sh
+>   ```
+> - Optionally, to add the Python client for Ollama:
+>   ```dockerfile
+>   RUN conda install -c conda-forge ollama-python -y
+>   ```
+
+### 2. Run the API
+
+Expose the FastAPI app on port 8000:
+
+```bash
+docker run --rm -p 8000:8000 check-imaging:latest
+```
+
+Your API will be available at `http://localhost:8000`.
+
+## API Usage
+
+### Endpoint
+
+```
+POST /check-image
+```
+
+### How to Send Input
+
+You can either upload a file or provide an image URL via `multipart/form-data`.
+
+-   **Upload a file:** Put the file in the `image_file` form field.
+-   **Provide an image URL:** Put the URL string in the `image_url` form field.
+
+> **Important:** Only send one of `image_file` or `image_url` per request.
+
+### Optional Fields
+
+You may support the following optional fields in the form data:
+
+-   `threshold` (float): e.g., `0.67`
+
+### Examples
+
+#### cURL
+
+##### Upload a file
+
+```bash
+curl -X POST http://localhost:8000/check-image \
+  -F "image_file=@tests/check_front.jpg" \
+  -F "threshold=0.67" \
+  -o check_front.tiff
+```
+
+This will save the converted TIFF to `check_front.tiff`.
+
+##### Use a remote image URL
+
+```bash
+curl -X POST http://localhost:8000/check-image \
+  -F "image_url=https://example.com/path/to/check_front.jpg" \
+  -F "threshold=0.67" \
+  -o check_front.tiff
+```
+
+#### Python (`requests`)
+
+##### Upload a file
 
 ```python
-from check_imaging import format_check_image_for_x9
+import requests
 
-with open('tests/check_front.jpg', 'rb') as in_file:
-    converted = format_check_image_for_x9(in_file, threshold=.67)
-    with open('tests/check_front.tiff', 'wb') as out_file:
-        out_file.write(converted.getvalue())
-```
-
-## Installation Guide
-1. Install Conda Environment
-```
-mkdir -p ~/miniconda3
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
-bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-rm -rf ~/miniconda3/miniconda.sh
-
-~/miniconda3/bin/conda init bash
-~/miniconda3/bin/conda init zsh
+url = "http://localhost:8000/check-image"
+files = {"image_file": open("tests/check_front.jpg", "rb")}
+resp = requests.post(url, files=files)
+print(resp.text)
 ```
 
-2. Create a new conda environment
-```
-conda create --name moovenv python=3.12
-```
+##### Use a remote image URL
 
-3. Activate the environment.
-```
-conda activate moovenv
-```
+```python
+import requests
 
-4. Install requirements
+url = "http://localhost:8000/check-image"
+data = {
+    "image_url": "https://example.com/path/to/check_front.jpg",
+}
+resp = requests.post(url, data=data)
+print(resp.text)
 ```
-pip install -r requirements.txt
-```
-
-5. Run API server
-```
-uvicorn main:app --reload
-```
-
-5. Install Ollama and download 
-```
-    curl -fsSL https://ollama.com/install.sh | sh
-```
-
-6. Reload your terminal to load ollma.
-
-7. Download llava:7b.
-```
-    ollama pull llava:7b
-```
-
-## Available Models
-- `gemma3:4b`
-- `llava:7b`
-- `llava`

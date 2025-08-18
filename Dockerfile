@@ -10,6 +10,12 @@ RUN conda create -n check-imaging-env python=3.12.11 -y
 # Make RUN, CMD, and ENTRYPOINT commands use the Conda environment
 SHELL ["conda", "run", "-n", "check-imaging-env", "/bin/bash", "-c"]
 
+# Install Ollama CLI
+RUN curl -fsSL https://ollama.com/install.sh | sh
+
+# (Optional) Install Ollama Python client
+RUN conda install -c conda-forge ollama-python -y
+
 # Copy the requirements file into the container
 COPY requirements.txt .
 
