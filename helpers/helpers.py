@@ -1,16 +1,16 @@
 import os
-import io, time
+import io
+import time
 from typing import Callable
 from functools import wraps
 from uuid import uuid4
-from decimal import Decimal
 import pillow_avif
 from PIL import Image, ImageOps
 from pillow_heif import register_heif_opener
 import requests
-from fastapi import HTTPException, UploadFile
-from schemas.schemas import Check
+from fastapi import HTTPException
 import ollama
+from schemas.schemas import Check
 
 register_heif_opener()
 
@@ -18,7 +18,7 @@ def download_file_from_url(url, output_path):
     '''
         Download file from URL
     '''
-    response = requests.get(url, stream=True)
+    response = requests.get(url, stream=True, timeout=10)
 
     try:
         with open(output_path, 'wb') as file:
@@ -103,7 +103,7 @@ async def get_check_data_from_image(image_path):
     print(response['message'])
 
     try:
-        check_data = Check.model_validate_json(response.message.content)
+        check_data = Check.model_validate_json(response['message'].content)
 
         return check_data
     except:
