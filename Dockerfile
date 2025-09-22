@@ -1,33 +1,39 @@
-# Use the official Miniconda3 image as a parent image
-FROM continuumio/miniconda3
+# Use a Miniconda base image
+FROM continuumio/miniconda3:latest
 
-# Set the working directory in the container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Create a Conda environment with a specific Python version
-RUN conda create -n check-imaging-env python=3.12.11 -y
+# Copy environment.yml if you have one for Conda packages
+# COPY environment.yml .
+# RUN conda env create -f environment.yml
+# ENV PATH="/opt/conda/envs/your_env_name/bin:$PATH"
+# ACTIVATE CONDA ENVIRONMENT (if using environment.yml)
+# RUN echo "conda activate your_env_name" >> ~/.bashrc
+# SHELL ["/bin/bash", "--login", "-c"]
 
-# Make RUN, CMD, and ENTRYPOINT commands use the Conda environment
-SHELL ["conda", "run", "-n", "check-imaging-env", "/bin/bash", "-c"]
+# Create a new Conda environment for your application
+RUN conda create -n check-image python=3.13 -y
+# Activate the Conda environment for subsequent commands
+SHELL ["conda", "run", "-n", "check-image", "/bin/bash", "-c"]
 
-# Install Ollama CLI
-RUN curl -fsSL https://ollama.com/install.sh | sh
-
-# (Optional) Install Ollama Python client
-RUN conda install -c conda-forge ollama-python -y
-
-# Copy the requirements file into the container
+# Copy requirements.txt and install Python dependencies using pip
 COPY requirements.txt .
-
-# Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application's code into the container
+# Install Uvicorn (if not in requirements.txt)
+RUN pip install --no-cache-dir uvicorn
+
+# Install Ollama (using the official script for Linux)
+# This assumes you want Ollama server running within this container
+RUN curl -fsSL https://ollama.com/install.sh | sh
+
+# Copy your application code
 COPY . .
 
-# Make port 8000 available to the world outside this container
+# Expose the port Uvicorn will listen on (e.g., 8000)
 EXPOSE 8000
 
-# Run the application when the container launches
-# Replace app.main:app with the correct path to your FastAPI app instance
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Command to run your application with Uvicorn
+# Replace 'main:app' with your actual FastAPI application entry point
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
