@@ -65,9 +65,7 @@ You may support the following optional fields in the form data:
 
 ```bash
 curl -X POST http://localhost:8000/check-image \
-  -F "image_file=@tests/check_front.jpg" \
-  -F "threshold=0.67" \
-  -o check_front.tiff
+  -F "image_file=@tests/check_front.jpg"
 ```
 
 This will save the converted TIFF to `check_front.tiff`.
@@ -76,9 +74,7 @@ This will save the converted TIFF to `check_front.tiff`.
 
 ```bash
 curl -X POST http://localhost:8000/check-image \
-  -F "image_url=https://example.com/path/to/check_front.jpg" \
-  -F "threshold=0.67" \
-  -o check_front.tiff
+  -F "image_url=https://example.com/path/to/check_front.jpg"
 ```
 
 #### Python (`requests`)
