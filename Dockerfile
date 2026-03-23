@@ -28,12 +28,20 @@ RUN pip install --no-cache-dir uvicorn
 # This assumes you want Ollama server running within this container
 RUN curl -fsSL https://ollama.com/install.sh | sh
 
+# Create non-root user
+RUN useradd -m -r appuser
+
 # Copy your application code
 COPY . .
+
+# Set ownership
+RUN chown -R appuser:appuser /app
 
 # Expose the port Uvicorn will listen on (e.g., 8000)
 EXPOSE 8000
 
 # Command to run your application with Uvicorn
 # Replace 'main:app' with your actual FastAPI application entry point
+USER appuser
+
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

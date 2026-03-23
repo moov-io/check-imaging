@@ -34,7 +34,7 @@ def url_to_image(url:str) -> Image.Image:
         return None
 
     try:
-        response = requests.get(url, timeout=5, verify=False)
+        response = requests.get(url, timeout=5, verify=True)
         response.raise_for_status()
 
         # Load the image data into a PIL Image object
