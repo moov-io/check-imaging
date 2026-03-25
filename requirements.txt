@@ -1,4 +1,4 @@
-Wand==0.6.13
+Wand==0.7.0
 fastapi[all]
 uvicorn
 Pillow
