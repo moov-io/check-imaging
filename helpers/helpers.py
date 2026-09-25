@@ -69,7 +69,7 @@ def image_upload_decorator(
                 image_data = ImageOps.exif_transpose(image_data)
                 image_data.save(image_file_path, "PNG", quality=85, optimize=True)
             elif image_url:
-                download_file_from_url(image_file_path, image_url)
+                download_file_from_url(image_url, image_file_path)
                 image_data = url_to_image(image_url)
             else:
                 if image_required:
